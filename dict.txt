@@ -1,0 +1,70 @@
+Цвет    color
+Здоровье    Health
+Мощность    power
+Масса  Weight
+Макс. скорость  Max. speed
+ОРУЖИЕ    WEAPONS
+Урон       damage
+Перезарядка  Cooldown/recharge/reloading 
+Статистика    Statistics
+СТРЕЛЬБА    SHOOTING
+Выстрелов  Shots
+Попаданий  Hits
+Точность    accuracy
+Противников убито   enemies killed
+Урона нанесено damage applied
+Очков  Points
+Бонусов собрано   bonuses collected
+Смертей  Deaths
+Характеристики    Features
+
+Единицы измерения   units of measurement
+Расстояние	пиксель  pixel distance
+Время	тик  time tick
+Скорость	пикселей / тик   Speed ??pixels / tick
+Углы	градус  degree angles 
+
+
+Отсчет координат идет из верхнего левого угла: точка (0, 0).
+
+Countdown coordinate goes from the upper left corner: the point (0, 0).
+
+Нулевой угол направлен вверх. Положительное направление - по часовой стрелке.
+Zero angle upwards. Positive direction - clockwise.
+
+
+
+basics of JavaScript
+
+
+examples of strategies
+
+// будем целиться в первого противника
+// Will aim at the first enemy
+
+// Получим угол между вектором вашего дула и вектором из вашего авто в цель
+// Get the angle between the vector and the vector of your muzzle out of your car to the goal
+
+
+Движение   movement
+
+
+// каждое попадание таким снарядом отнимает 100 мощности у авто на 200 тиков и наносит 10 урона
+
+каждое each
+попадание hit
+таким  so/such/eighter
+снарядом shell/bullet/whizbang
+отнимает takes
+мощности  power
+у  
+авто  cars
+на  on/to/at
+тиков  ticks
+и  and 
+наносит deals
+ урона  damage
+
+// эффект суммируется до 5 раз, предел уменьшения мощности - 80
+ // Effect stacks up to 5 times the limit of power reduction - 80
+
