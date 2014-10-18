@@ -1,28 +1,28 @@
 function update(car, world) {
     
-	var enemies = world.getEnemies(); // Получаем массив всех противников
-    var enemiesCount = enemies.length; // Длинна массива - количество противников
+	var enemies = world.getEnemies(); // Get an array of all opponents
+    var enemiesCount = enemies.length; // Array length - the number of opponents
     
     if (enemiesCount > 0) {
-        // Переменные для поиска ближайшего противника
+        // Variables to find the nearest enemy
         var minDist = 9999;
         var minI = 0;
         
-        // Ищем ближайшего противника
+        // Find the nearest enemy
         for (var i = 0; i < enemiesCount; i++) {
             var e = enemies[i];
             var dist = car.getDistanceTo(e.getX(), e.getY());
-            if (minDist > dist && e.getHealth() > 0) { // e.getHealth() > 0 - чтобы не стрелять по мертвым
+            if (minDist > dist && e.getHealth() > 0) { // e.getHealth() > 0 - not to shoot at the dead
                 minI = i;
                 minDist = dist;
             }
         }
 
-        // Целимся и стреляем
+        // Aim and shoot
         var e = enemies[minI];
-        var a = car.getTurretAngleTo(e.getX(), e.getY()); // Получаем угол между вектором вашего дула и вектором из вашего авто в цель
+        var a = car.getTurretAngleTo(e.getX(), e.getY()); // Get the angle between the vector and the vector of your muzzle out of your car to the goal
         
-        if (Math.abs(a) > 5) { // Если полученный угол больше пяти градусов, то продолжаем целиться
+        if (Math.abs(a) > 5) { // If the resulting angle of more than five degrees, we continue to aim
             if (a < 0) {
                 car.setTurretAngle(car.getTurretAngle() - 5);
             }
@@ -30,19 +30,19 @@ function update(car, world) {
                 car.setTurretAngle(car.getTurretAngle() + 5);
             }
         }
-        else { // Если же угол меньше пяти градусов, то стреляем
+        else { // If the angle is less than five degrees, then shoot
             car.shoot();
         }
     }
 
-    var bonuses = world.getBonuses(); // Получаем массив всех бонусов
+    var bonuses = world.getBonuses(); // Get an array of all bonuses
     
-    if (bonuses.length) { // Если на поле есть бонусы, то будем двигаться к ним        
-     	var angle = car.getAngleTo(bonuses[0].getX(), bonuses[0].getY()); // Получаем угол до бонуса
-        car.setWheelAngle(angle); // Задаем соответствующий угол колесам
-        car.setSpeed(car.getMaxSpeed()); // Задаем максимальную скорость нашей машине
+    if (bonuses.length) { // If the field is the bonus, we will move them
+     	var angle = car.getAngleTo(bonuses[0].getX(), bonuses[0].getY()); // Get angle to bonus
+        car.setWheelAngle(angle); // Specify the corresponding angle of the wheels
+        car.setSpeed(car.getMaxSpeed()); // Specify the maximum speed of our car
     }
-    else { // Если же бонусов на карте нет, потихоньку отъезжаем назад
+    else { // If bonuses not on the map, slowly pulls back
         car.setSpeed(-1);
     }
     
