@@ -41,15 +41,24 @@ function update(car, world) {
     var bonuses = world.getBonuses(); // Get an array of all bonuses
     
     if (bonuses.length) { // If the field is the bonus, we will move them
-     	var angle = car.getAngleTo(bonuses[0].getX(), bonuses[0].getY()); // Get angle to bonus
+        var minDist2 = 9999;
+        var minI2 = 0;
+        for (var i = 0; i < bonuses; i++) {
+            var b = bonuses[i];
+            var dist = car.getDistanceTo(b.getX(), b.getY());
+            if (minDist2 > dist) {
+                minI2 = i;
+                minDist2 = dist;
+            }
+        }
+     	var angle = car.getAngleTo(bonuses[minI2].getX(), bonuses[minI2].getY()); // Get angle to bonus
         car.setWheelAngle(angle); // Specify the corresponding angle of the wheels
         //Because wheelangle range is 20, the minimum turning radius is
         //r = L / sin(a)
         // for car length is 60, the min r is 175.42
         //var rad = Math.PI * 20 / 180;
         //var r = car.getHeight() / Math.sin(rad);
-        ai.log(angle); 
-        //TODO: if angle > 90, roll back, then go
+        // if angle > 90, roll back, then go
         if (Math.abs(angle) > 80){
             var a = -1 * angle;
             car.setWheelAngle(a);
@@ -60,16 +69,41 @@ function update(car, world) {
         }
     }
     else { // If bonuses not on the map, slowly pulls back
-        car.setSpeed(-1);
+        var hostileEnemies = findWhoTargetMe(car, enemies);
+        if (hostileEnemies.length > 0){
+            var target = findSafePlace(car, hostileEnemies);
+            ai.log("target place:" + target.x + ", " + target.y); 
+            if (target.x < world.getWidth() && target.y < world.getHeight()){
+                var angle = car.getAngleTo(target.x, target.y); 
+                car.setWheelAngle(angle); 
+                ai.log("angle:" + angle); 
+                if (Math.abs(angle) > 80){
+                    var a = -1 * angle;
+                    car.setWheelAngle(a);
+                    car.setSpeed(-0.7 * car.getMaxSpeed());
+                    ai.log("speed:" + -0.7 * car.getMaxSpeed()); 
+
+                }
+                else {
+                    car.setSpeed(car.getMaxSpeed()); // Specify the maximum speed of our car
+                }
+            }
+            else {
+                car.setSpeed(-1);
+            }
+        }
+        else {
+            car.setSpeed(-1);
+        }
     }
     
     return car;
 }
 
-function findWhoTargetMe(enemies) {
+function findWhoTargetMe(car, enemies) {
     //Calc min distance of each enemy, if I am the nearest, I should backoff;
     var enemiesCount = enemies.length;
-    var enemiesTargetMe = {};
+    var enemiesTargetMe = [];
     if (enemiesCount > 0) {
         for (var i = 0; i < enemiesCount; i++) {
             var e = enemies[i];
@@ -93,12 +127,108 @@ function findWhoTargetMe(enemies) {
             }
             if (dist <= minDistance){
                 // I am the nearest enemy of enemy[i], I should backoff;
-                enemiesTargetMe[e.getId()] = dist;
+                enemiesTargetMe.push(e);
             }
         }
     }
     return enemiesTargetMe;
 };
+
+function distance(x1, y1, x2, y2) {
+    var d = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+    return d;
+}
+function inBlindZone(car, x, y, world, zone) {
+    if (distance(x, y, zone.leftCenter.x, zone.leftCenter.y) <= zone.r) {
+        return true;
+    }
+    else if (distance(x, y, zone.rightCenter.x, zone.rightCenter.y) <= zone.r) {
+        return true;
+    }
+    return false;
+}
+function blindZone(car, world) {
+    //in the left and right side of the vehicle, there is a cycle it can't reach.
+    var height = car.getHeight();
+    var rad = angleToRad(20);
+    // minimum turning radius
+    var r = height / Math.sin(rad); 
+    var carAngle = car.getAngle();
+    var leftRAngle = (carAngle - 90 + 360) % 360;
+    var rightRAngle = (carAngle + 90) % 360;
+    var leftRVector = {}
+    leftRVector.y = r * Math.sin(angleToRad(leftRAngle))
+    leftRVector.x = r * Math.cos(angleToRad(leftRAngle))
+    var rightRVector = {}
+    rightRVector.y = r * Math.sin(angleToRad(rightRAngle))
+    rightRVector.x = r * Math.cos(angleToRad(rightRAngle))
+    var leftCycleCenter = {}
+    leftCycleCenter.x = car.getX() + leftRVector.x
+    leftCycleCenter.y = car.getY() + leftRVector.y
+    var rightCycleCenter = {}
+    rightCycleCenter.x = car.getX() + rightRVector.x
+    rightCycleCenter.y = car.getY() + rightRVector.y
+    var twoCycle = {}
+    twoCycle.leftCenter = leftCycleCenter;
+    twoCycle.rightCycleCenter = rightCycleCenter;
+    twoCycle.r = r;
+    return twoCycle;
+}
+
+function angleToRad(angle){
+    var rad = angle * Math.PI / 180;
+    return rad;
+}
+
+function radToAngle(rad){
+    var angle = rad * 180 / Math.PI;
+    return angle;
+}
+
+function findSafePlace(car, enemies) {
+    //if I am in some enemies 'nearest targets', find a direction to go out.
+    //TODO: mind the wall.
+    var vectors = [];
+    for (var i = 0; i < enemies.length; i++) {
+        var e = enemies[i];
+        var vector = {};
+        vector.x = car.getX() - e.getX();
+        vector.y = car.getY() - e.getY();
+        vectors.push(vector);
+    }
+    var runawayvector = synthesisVectors(vectors);
+    var target = {};
+    if (runawayvector) {
+        target.x = car.getX() + runawayvector.x;
+        target.y = car.getY() + runawayvector.y;
+    }
+    return target;
+}
+
+function synthesisVectors(vectors) {
+    // AB + BC = AC
+    // A(x1,y1)，B(x2,y2), C(x3,y3)
+    // AB+BC=(x2-x1,y2-y1)+(x3-x2,y3-y2)=(x2-x1+x3-x2,y2-y1+y3-y2)=(x3-x1,y3-y1)=AC
+    // for closer enemy, farther we should go. so change length of vector
+    var result;
+    if (vectors.length > 0) {
+        result = vectors[0];
+    }
+    if (vectors.length > 1) {
+        for (var i = 1; i < vectors.length; i++) {
+            var m1 = Math.sqrt(Math.pow(result.x, 2) + Math.pow(result.y, 2));
+            var m2 = Math.sqrt(Math.pow(vectors[i].x, 2) + Math.pow(vectors[i].y, 2));
+            var fix_x1 = result.x * m2 / m1;
+            var fix_y1 = result.y * m2 / m1;
+            var fix_x2 = vectors[i].x * m1 / m2;
+            var fix_y2 = vectors[i].y * m1 / m2;
+            result.x = fix_x1 + fix_x2;
+            result.y = fix_y1 + fix_y2;
+        };
+    }
+    return result;
+}
+
 
 function distance(x1, y1, x2, y2) {
     var d = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
