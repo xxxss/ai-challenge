@@ -68,3 +68,5 @@ examples of strategies
 // эффект суммируется до 5 раз, предел уменьшения мощности - 80
  // Effect stacks up to 5 times the limit of power reduction - 80
 
+
+Очки  points
