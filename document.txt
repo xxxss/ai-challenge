@@ -1,0 +1,35 @@
+about the game
+
+To participate in the battles, you need to register on the site and create a character. After that, the game will take you to the regular battles with random opponents sandbox.
+
+There are three leagues: sandpit, 2 and Division 1 League. Each week, the top 5 players in each of them proceed to the next league, and the worst fall in the previous 5. Prize-winners of the first league receive symbolic rewards.
+
+Games are held every 15-30 minutes. Players compete only within their own league, earn points for certain actions (causing damage, murder, recruitment bonuses). Scoring strongly influences accuracy.
+
+Every day in leagues tournaments are held on the departure of the top 16 players. For the victory in each round of the tournament player gets 5000 points and 200 coins.
+
+Weekly statistics of players cleared.
+
+Terms
+
+Each fight lasts 2000 ticks (counting from zero tick) or until there is a living machine.
+
+Points are awarded for:
+·Bonuses (100 points)
+·Hit by enemies (as many points which damage has been done)
+·Murder (200 points)
+·All surviving players receive 500 points.
+·At the end of the game, all the scores are multiplied by k = precision / 20 (if the ratio is greater than 1 that is greater than 20% accuracy)
+
+Slip is considered a dead hit on the car or in the wall. Faced bullets and bullets hit the bonuses for failures are not considered.
+
+units of measurement
+
+Distance        pixel
+time            tic
+speed           pixels / tick
+angles          degrees
+
+Countdown coordinate goes from the upper left corner: the point (0, 0).
+
+Zero angle upwards. Positive direction - clockwise.
