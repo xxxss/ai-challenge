@@ -6,10 +6,6 @@ function update(car, world) {
 	var enemies = world.getEnemies(); // Get an array of all opponents
     var enemiesCount = enemies.length; // Array length - the number of opponents
     var blindZone = getBlindZone(car, world);
-    ai.log("car height:" + car.getHeight() + ", car width:" + car.getWidth())
-    ai.log("zone.r:" + blindZone.r)
-    ai.log("zone.leftcenter:" + blindZone.leftCenter.x + ", " + blindZone.leftCenter.y)
-    ai.log("zone.rightCenter:" + blindZone.rightCenter.x + ", " + blindZone.rightCenter.y)
     
     if (enemiesCount > 0) {
         // Variables to find the nearest enemy
@@ -55,6 +51,11 @@ function update(car, world) {
             if (inBlindZone(b.getX(), b.getY(), blindZone)) {
                 continue;
             }
+            else {
+                ai.log("zone.r:" + blindZone.r);
+                ai.log("zone.leftcenter:" + blindZone.leftCenter.x + ", " + blindZone.leftCenter.y);
+                ai.log("zone.rightCenter:" + blindZone.rightCenter.x + ", " + blindZone.rightCenter.y);
+            }
             var dist = car.getDistanceTo(b.getX(), b.getY());
             if (minDist2 > dist) {
                 minI2 = i;
@@ -62,7 +63,7 @@ function update(car, world) {
             }
         }
      	var angle = car.getAngleTo(bonuses[minI2].getX(), bonuses[minI2].getY()); // Get angle to bonus
-        ai.log("bonus" + bonuses[minI2].getX() + ", " + bonuses[minI2].getY())
+        ai.log("bonus" + bonuses[minI2].getX() + ", " + bonuses[minI2].getY());
         car.setWheelAngle(angle); // Specify the corresponding angle of the wheels
         car.setSpeed(car.getMaxSpeed()); // Specify the maximum speed of our car
         //Because wheelangle range is 20, the minimum turning radius is
@@ -149,7 +150,7 @@ function findWay(car, world, x, y) {
 }
 
 function distance(x1, y1, x2, y2) {
-    var d = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+    var d = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     return d;
 }
 function inBlindZone(x, y, zone) {
@@ -166,6 +167,7 @@ function getBlindZone(car, world) {
     var height = car.getHeight();
     var rad = angleToRad(20);
     // minimum turning radius
+    // TODO: add half of the car's width;
     var r = height / Math.sin(rad); 
     var carAngle = car.getAngle();
     var leftRAngle = (carAngle - 90 + 360) % 360;
@@ -173,19 +175,19 @@ function getBlindZone(car, world) {
     //IMPORTANT: car's angle is not start from x axes, so minus 90 degree.
     leftRAngle = (leftRAngle - 90 + 360) % 360;
     rightRAngle = (rightRAngle - 90 + 360) % 360;
-    var leftRVector = {}
-    leftRVector.y = r * Math.sin(angleToRad(leftRAngle))
-    leftRVector.x = r * Math.cos(angleToRad(leftRAngle))
-    var rightRVector = {}
-    rightRVector.y = r * Math.sin(angleToRad(rightRAngle))
-    rightRVector.x = r * Math.cos(angleToRad(rightRAngle))
-    var leftCycleCenter = {}
-    leftCycleCenter.x = car.getX() + leftRVector.x
-    leftCycleCenter.y = car.getY() + leftRVector.y
-    var rightCycleCenter = {}
-    rightCycleCenter.x = car.getX() + rightRVector.x
-    rightCycleCenter.y = car.getY() + rightRVector.y
-    var twoCycle = {}
+    var leftRVector = {};
+    leftRVector.y = r * Math.sin(angleToRad(leftRAngle));
+    leftRVector.x = r * Math.cos(angleToRad(leftRAngle));
+    var rightRVector = {};
+    rightRVector.y = r * Math.sin(angleToRad(rightRAngle));
+    rightRVector.x = r * Math.cos(angleToRad(rightRAngle));
+    var leftCycleCenter = {};
+    leftCycleCenter.x = car.getX() + leftRVector.x;
+    leftCycleCenter.y = car.getY() + leftRVector.y;
+    var rightCycleCenter = {};
+    rightCycleCenter.x = car.getX() + rightRVector.x;
+    rightCycleCenter.y = car.getY() + rightRVector.y;
+    var twoCycle = {};
     twoCycle.leftCenter = leftCycleCenter;
     twoCycle.rightCenter = rightCycleCenter;
     twoCycle.r = r;

@@ -73,13 +73,14 @@ xfunction update(car, world) {
 
 	}
 
-	var bonuses = world.getBonuses();	// Array with bonuses, ¼ÓÑª°ü
+	var bonuses = world.getBonuses();	// Array with bonuses
 
 	for (var i = 0; i < bonuses.length; i++) {
 		var bonus = bonuses[i];
 
 		bonus.getX();
 		bonus.getY(); 	// Coordinates bonus
+                //center of the bonus. bonus width, height are 26;
 		bonus.getType(); // Type of bonus
 		// if (bonus.getType() == 1) +100 lives
 		// if (bonus.getType() == 2) +3 Premium bullet
