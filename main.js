@@ -46,15 +46,10 @@ function update(car, world) {
     if (bonuses.length) { // If the field is the bonus, we will move them
         var minDist2 = 9999;
         var minI2 = 0;
-        for (var i = 0; i < bonuses; i++) {
+        for (var i = 0; i < bonuses.length; i++) {
             var b = bonuses[i];
             if (inBlindZone(b.getX(), b.getY(), blindZone)) {
                 continue;
-            }
-            else {
-                ai.log("zone.r:" + blindZone.r);
-                ai.log("zone.leftcenter:" + blindZone.leftCenter.x + ", " + blindZone.leftCenter.y);
-                ai.log("zone.rightCenter:" + blindZone.rightCenter.x + ", " + blindZone.rightCenter.y);
             }
             var dist = car.getDistanceTo(b.getX(), b.getY());
             if (minDist2 > dist) {
@@ -63,7 +58,6 @@ function update(car, world) {
             }
         }
      	var angle = car.getAngleTo(bonuses[minI2].getX(), bonuses[minI2].getY()); // Get angle to bonus
-        ai.log("bonus" + bonuses[minI2].getX() + ", " + bonuses[minI2].getY());
         car.setWheelAngle(angle); // Specify the corresponding angle of the wheels
         car.setSpeed(car.getMaxSpeed()); // Specify the maximum speed of our car
         //Because wheelangle range is 20, the minimum turning radius is
@@ -86,7 +80,7 @@ function update(car, world) {
         if (hostileEnemies.length > 0){
             var target = findSafePlace(car, hostileEnemies);
             ai.log("target place:" + target.x + ", " + target.y); 
-            if (target.x < world.getWidth() && target.y < world.getHeight()){
+            if (car.getWidth() < target.x < world.getWidth() && car.getWidth() < target.y < world.getHeight()){
                 var angle = car.getAngleTo(target.x, target.y); 
                 car.setWheelAngle(angle); 
                 if (Math.abs(angle) > 80){
@@ -109,6 +103,11 @@ function update(car, world) {
     }
     
     return car;
+}
+
+function distance(x1, y1, x2, y2) {
+    var d = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    return d;
 }
 
 function findWhoTargetMe(car, enemies) {
@@ -137,6 +136,7 @@ function findWhoTargetMe(car, enemies) {
                 }
             }
             if (dist <= minDistance){
+                ai.log("dist:" + dist + ", " + minDistance)
                 // I am the nearest enemy of enemy[i], I should backoff;
                 enemiesTargetMe.push(e);
             }
@@ -149,10 +149,6 @@ function findWay(car, world, x, y) {
     //
 }
 
-function distance(x1, y1, x2, y2) {
-    var d = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-    return d;
-}
 function inBlindZone(x, y, zone) {
     if (distance(x, y, zone.leftCenter.x, zone.leftCenter.y) <= zone.r) {
         return true;
@@ -249,7 +245,3 @@ function synthesisVectors(vectors) {
 }
 
 
-function distance(x1, y1, x2, y2) {
-    var d = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-    return d;
-}
