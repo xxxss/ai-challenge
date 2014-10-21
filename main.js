@@ -6,6 +6,10 @@ function update(car, world) {
 	var enemies = world.getEnemies(); // Get an array of all opponents
     var enemiesCount = enemies.length; // Array length - the number of opponents
     var blindZone = getBlindZone(car, world);
+    ai.log("car height:" + car.getHeight() + ", car width:" + car.getWidth())
+    ai.log("zone.r:" + blindZone.r)
+    ai.log("zone.leftcenter:" + blindZone.leftCenter.x + ", " + blindZone.leftCenter.y)
+    ai.log("zone.rightCenter:" + blindZone.rightCenter.x + ", " + blindZone.rightCenter.y)
     
     if (enemiesCount > 0) {
         // Variables to find the nearest enemy
@@ -25,14 +29,16 @@ function update(car, world) {
         // Aim and shoot
         var e = enemies[minI];
         var a = car.getTurretAngleTo(e.getX(), e.getY()); // Get the angle between the vector and the vector of your muzzle out of your car to the goal
-        
-        if (Math.abs(a) > 5) { // If the resulting angle of more than five degrees, we continue to aim
+        if (Math.abs(a) >= 10) {
             if (a < 0) {
-                car.setTurretAngle(car.getTurretAngle() - 5);
+                car.setTurretAngle(car.getTurretAngle() - 10);
             }
             else {
-                car.setTurretAngle(car.getTurretAngle() + 5);
+                car.setTurretAngle(car.getTurretAngle() + 10);
             }
+        }
+        else if (Math.abs(a) > 1) { // If the resulting angle of more than five degrees, we continue to aim
+                car.setTurretAngle(car.getTurretAngle() + a);
         }
         else { // If the angle is less than five degrees, then shoot
             car.shoot();
@@ -58,20 +64,21 @@ function update(car, world) {
      	var angle = car.getAngleTo(bonuses[minI2].getX(), bonuses[minI2].getY()); // Get angle to bonus
         ai.log("bonus" + bonuses[minI2].getX() + ", " + bonuses[minI2].getY())
         car.setWheelAngle(angle); // Specify the corresponding angle of the wheels
+        car.setSpeed(car.getMaxSpeed()); // Specify the maximum speed of our car
         //Because wheelangle range is 20, the minimum turning radius is
         //r = L / sin(a)
         // for car length is 60, the min r is 175.42
         //var rad = Math.PI * 20 / 180;
         //var r = car.getHeight() / Math.sin(rad);
         // if angle > 90, roll back, then go
-        if (Math.abs(angle) > 90){
-            var a = -1 * angle;
-            car.setWheelAngle(a);
-            car.setSpeed(-0.7 * car.getMaxSpeed());
-        }
-        else {
-            car.setSpeed(car.getMaxSpeed()); // Specify the maximum speed of our car
-        }
+        //if (Math.abs(angle) > 90){
+        //    var a = -1 * angle;
+        //    car.setWheelAngle(a);
+        //    car.setSpeed(-0.7 * car.getMaxSpeed());
+        //}
+        //else {
+        //    car.setSpeed(car.getMaxSpeed()); // Specify the maximum speed of our car
+        //}
     }
     else { // If bonuses not on the map, slowly pulls back
         var hostileEnemies = findWhoTargetMe(car, enemies);
@@ -163,6 +170,9 @@ function getBlindZone(car, world) {
     var carAngle = car.getAngle();
     var leftRAngle = (carAngle - 90 + 360) % 360;
     var rightRAngle = (carAngle + 90) % 360;
+    //IMPORTANT: car's angle is not start from x axes, so minus 90 degree.
+    leftRAngle = (leftRAngle - 90 + 360) % 360;
+    rightRAngle = (rightRAngle - 90 + 360) % 360;
     var leftRVector = {}
     leftRVector.y = r * Math.sin(angleToRad(leftRAngle))
     leftRVector.x = r * Math.cos(angleToRad(leftRAngle))
@@ -177,7 +187,7 @@ function getBlindZone(car, world) {
     rightCycleCenter.y = car.getY() + rightRVector.y
     var twoCycle = {}
     twoCycle.leftCenter = leftCycleCenter;
-    twoCycle.rightCycleCenter = rightCycleCenter;
+    twoCycle.rightCenter = rightCycleCenter;
     twoCycle.r = r;
     return twoCycle;
 }
