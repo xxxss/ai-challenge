@@ -37,7 +37,14 @@ function update(car, world) {
                 car.setTurretAngle(car.getTurretAngle() + a);
         }
         else { // If the angle is less than five degrees, then shoot
-            car.shoot();
+	        var freezingShotCount = car.getFreezingShotCount();
+	        var premiumShotCount = car.getPremiumShotCount();
+             if (premiumShotCount > 0) {
+                ai.log(car.getPremiumShotPower());
+                car.shoot("PREMIUM");
+            } else {
+                car.shoot();
+            }
         }
     }
 
@@ -74,6 +81,7 @@ function update(car, world) {
         //else {
         //    car.setSpeed(car.getMaxSpeed()); // Specify the maximum speed of our car
         //}
+        //TODO: there is space between blindzone 
     }
     else { // If bonuses not on the map, slowly pulls back
         var hostileEnemies = findWhoTargetMe(car, enemies);
